@@ -23,9 +23,9 @@ This function adds the transitions to the Replay buffer sequentially
 1.	If the length of the storage is equal to the maximum size defined for the replay buffer then the pointer gets reset to the starting location and starts overwriting the new records with old saved ones sequentially
 2.	If not then the transactions are appended to the storage (Replay buffer)
 
-![](p2s9/Images/Images/step_0.png)
+![](Images/Images/step_0.png)
 
-![](p2s9/Images/Images/step-1.gif)
+![](Images/Images/step-1.gif)
 
 # Sample Function
 This function returns a random subset of Replay memory based on the given batch size 
@@ -36,8 +36,8 @@ This function returns a random subset of Replay memory based on the given batch 
 •	Append the fetched data into the respective lists 
 4.Return the data to the calling function
 
-![](p2s9/Images/Images/sample.gif)
-![](p2s9/Images/Images/step_0.gif)
+![](Images/Images/sample.gif)
+![](Images/Images/step_0.gif)
 
 STEP2
 -------
@@ -56,11 +56,11 @@ There are 2 forward functions as well. One for each Critic model
 x - state , u-action
 1 for vertical concatenation #0 for Horizontal concatenation
 
-![](p2s9/Images/Images/step_3.png)
+![](Images/Images/step_3.png)
 
 # Q1 Function 
 Here we are planning to take the first critic to train the actor. It depends on the programmer, we can take critic2 or even the average. It doesn't matter in long run.
-![](p2s9/Images/Images/Q1.png)
+![](Images/Images/Q1.png)
 
 Create a T3D class. 
 inputs
@@ -74,7 +74,7 @@ max_action  - Not required as it's going to come from
 5.	call the actor forward function using the state variable , sent that to cpu, extract the data ,convert to numpy and flatten the output
 
 
-![](p2s9/Images/Images/T3D_net.png)
+![](Images/Images/T3D_net.png)
 
 Step-4
 ----------
@@ -94,13 +94,13 @@ for each iteration
 1. Select sample data from replay buffer 
 2. send each value to the GPU
 
-![](p2s9/Images/Images/step_4.png)
+![](Images/Images/step_4.png)
 
 # Step 5
 -----------
 From the next state s', the actor target plays the next action a'. This is required as the next state and action goes for critic. But before we send it to critic, we need to add gaussian noise
 
-![](p2s9/Images/Images/step_5.png)
+![](Images/Images/step_5.png)
 
 Step 6
 ---------
@@ -109,17 +109,17 @@ We add gaussian noise to this next action a' and we clamp it in a range of value
 2.	clamp the noise with min and max value 
 3.	So next action is next action + noise which is clamped with the max action value from -ve to +ve
 
-![](p2s9/Images/Images/step_6.png)
+![](Images/Images/step_6.png)
 
 Step 7
 ---------
 Now the two critic targets take each the tuple (s',a') as input and return  two Q values , Qt1(s',a') and Qt2(s',a') as outputs
 
-![](p2s9/Images/Images/step_7.png)
+![](Images/Images/step_7.png)
 
 # Step 8
 Keep the minimum of the target Q values
-![](p2s9/Images/Images/step_8.png)
+![](Images/Images/step_8.png)
 
 # Step 9
 •	target_Q = reward + (1-done) * discount * target_Q
@@ -129,15 +129,15 @@ Keep the minimum of the target Q values
 •	As target_Q1 and target_Q2 are from different computation chaims/maps. Hence it's very much required to detach 
 •	before we compute the target_Q again .
 
-![](p2s9/Images/Images/step_9.png)
+![](Images/Images/step_9.png)
 
 # Step 10
 Two critic models take (s,a) and return the two Q values
-![](p2s9/Images/Images/step_10.png)
+![](Images/Images/step_10.png)
 
 # Step 11
 We compute the loss coming from the two critic models. The critic loss is the sum of both critic loss1 and critic loss 2
-![](p2s9/Images/Images/step_11.png)
+![](Images/Images/step_11.png)
 
 # Step12
 •	Backpropagate this critic loss and update the parameters of two critic models 
@@ -145,7 +145,7 @@ We compute the loss coming from the two critic models. The critic loss is the su
 1.	initialize the gradients to zero
 2.	compute the gradients
 3.	perform the weight updates
-![](p2s9/Images/Images/step-12gif.gif)
+![](Images/Images/step-12gif.gif)
 
 Step 13
 -------------
@@ -161,7 +161,7 @@ The process from 1-5 repeats twice and then
 Now this whole process 1-6 runs twice before it does the polyak averaging for the critic targets. That means the updates would have happened 4 times
 the Actor takes state gives action , the state and action is given to critic, then it takes the mean
 
-![](p2s9/Images/Images/step-13gif.gif)
+![](Images/Images/step-13gif.gif)
 
 Step 14
 ---------
@@ -170,7 +170,7 @@ Still , in once every two iterations , we update our Actor Target by polyak Aver
 •	For every combination of actor parameter and actor target parameter we take the param.data and target.param.data 
 •	and perform polyak averaging to update target_param data
 
-![](p2s9/Images/Images/step_14.png)
+![](Images/Images/step_14.png)
 
 Step 15
 ---------
@@ -179,6 +179,6 @@ Still , in once every two iterations , we update our Critic Target by polyak Ave
 •	For every combination of Critic parameter and Critic target parameter we take the param.data and target.param.data 
 •	and perform polyak averaging to update target_param data
 
-![](p2s9/Images/Images/step_15.png)
+![](Images/Images/step_15.png)
 
 
